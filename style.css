@@ -1,32 +1,43 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: sans-serif;
     margin: 0;
+    background-color: #121212;
+    color: white;
     display: flex;
     justify-content: center;
-    background-color: #1a1a1a;
-    color: white;
+    overflow-x: hidden;
 }
 
 .container {
+    width: 100%;
+    max-width: 600px;
     text-align: center;
-    width: 90%;
-    max-width: 500px;
-    padding-top: 20px;
+    padding: 10px;
 }
 
-.camera-container, .result-box {
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+}
+
+/* Force le format Paysage (16:9) */
+.landscape-mode {
     position: relative;
     width: 100%;
-    border: 4px solid #fff;
-    border-radius: 15px;
-    overflow: hidden;
-    margin-bottom: 20px;
+    aspect-ratio: 16 / 9; 
     background: #000;
+    border: 2px solid #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 10px 0;
 }
 
-#video, #photo-result {
+#video {
     width: 100%;
-    display: block;
+    height: 100%;
+    object-fit: cover; /* Remplit le rectangle sans déformer */
 }
 
 #frame-overlay {
@@ -36,33 +47,47 @@ body {
     width: 100%;
     height: 100%;
     pointer-events: none;
+    z-index: 10;
 }
 
-.btn-main, .btn-download {
-    background: #ff4757;
-    color: white;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 30px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
+#photo-result {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
-.btn-secondary {
-    background: #57606f;
+.btn-main {
+    background: #00d2d3;
     color: white;
-    padding: 15px 30px;
+    padding: 20px;
+    width: 80%;
+    border-radius: 50px;
     border: none;
-    border-radius: 30px;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.btn-icon {
+    background: #2f3542;
+    font-size: 1.5rem;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
     cursor: pointer;
-    margin-top: 10px;
 }
 
 .button-group {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
+    align-items: center;
+}
+
+.btn-download {
+    background: #ff9f43;
+    color: white;
+    text-decoration: none;
+    padding: 15px 40px;
+    border-radius: 30px;
 }

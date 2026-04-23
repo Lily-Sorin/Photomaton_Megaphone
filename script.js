@@ -76,5 +76,30 @@ retake.addEventListener('click', () => {
     screenResult.style.display = 'none';
     screenCapture.style.display = 'block';
 });
+snap.addEventListener('click', () => {
+    const context = canvas.getContext('2d');
 
+    // On utilise la taille réelle de la vidéo détectée par le téléphone
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // 1. Dessiner la photo
+    if (useFrontCamera) {
+        context.translate(canvas.width, 0);
+        context.scale(-1, 1);
+    }
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    context.setTransform(1, 0, 0, 1, 0, 0); // Reset miroir
+
+    // 2. Dessiner le cadre (Il prend 100% de la largeur et hauteur du canvas)
+    context.drawImage(frameOverlay, 0, 0, canvas.width, canvas.height);
+
+    // Affichage
+    const imageData = canvas.toDataURL('image/png');
+    photoResult.src = imageData;
+    downloadLink.href = imageData;
+    
+    screenCapture.style.display = 'none';
+    screenResult.style.display = 'block';
+});
 startCamera();

@@ -12,67 +12,58 @@ const screenResult = document.getElementById('screen-result');
 let currentStream = null;
 let useFrontCamera = true;
 
-// Fonction pour arrêter proprement la caméra
-function stopStream() {
-    if (currentStream) {
-        currentStream.getTracks().forEach(track => {
-            track.stop();
-        });
-        video.srcObject = null;
-    }
-}
-
 async function startCamera() {
-    stopStream(); // On éteint tout avant de recommencer
+    if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+    }
 
     const mode = useFrontCamera ? "user" : "environment";
     
-    const constraints = {
-        video: {
-            facingMode: { exact: mode } // "exact" force le navigateur à changer
-        },
-        audio: false
-    };
-
     try {
-        currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+        currentStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: mode },
+            audio: false
+        });
         video.srcObject = currentStream;
+        
+        // Appliquer l'effet miroir uniquement sur la vidéo en direct (selfie)
+        video.style.transform = useFrontCamera ? "scaleX(-1)" : "scaleX(1)";
     } catch (err) {
-        console.warn("Échec du mode 'exact', tentative en mode souple...", err);
-        // Si le mode "exact" échoue (certains vieux téléphones), on essaie le mode simple
-        try {
-            currentStream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: mode }
-            });
-            video.srcObject = currentStream;
-        } catch (err2) {
-            alert("Erreur caméra : " + err2.message);
-        }
+        alert("Erreur caméra : " + err.message);
     }
 }
 
-// Changer de caméra
-switchBtn.addEventListener('click', async () => {
+switchBtn.addEventListener('click', () => {
     useFrontCamera = !useFrontCamera;
-    await startCamera();
+    startCamera();
 });
 
-// Prendre la photo
 snap.addEventListener('click', () => {
-    if (!video.videoWidth) return;
-
     const context = canvas.getContext('2d');
-    
-    // On garde le format 16:9 paysage
-    canvas.width = 1280;
-    canvas.height = 720;
 
-    // Dessiner la vidéo
+    // 1. On donne au Canvas la taille RÉELLE du flux vidéo
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // 2. Si on est en caméra selfie, on doit inverser le dessin pour que 
+    // la photo finale ne soit pas inversée par rapport à ce qu'on voit
+    if (useFrontCamera) {
+        context.translate(canvas.width, 0);
+        context.scale(-1, 1);
+    }
+
+    // 3. On dessine la vidéo
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-    // Dessiner le cadre
+
+    // 4. On remet le contexte à la normale avant de dessiner le cadre
+    if (useFrontCamera) {
+        context.setTransform(1, 0, 0, 1, 0, 0);
+    }
+
+    // 5. On dessine le cadre par-dessus (il s'adapte à la taille du canvas)
     context.drawImage(frameOverlay, 0, 0, canvas.width, canvas.height);
 
+    // 6. Affichage du résultat
     const imageData = canvas.toDataURL('image/png');
     photoResult.src = imageData;
     downloadLink.href = imageData;
@@ -81,11 +72,9 @@ snap.addEventListener('click', () => {
     screenResult.style.display = 'block';
 });
 
-// Refaire une photo
 retake.addEventListener('click', () => {
     screenResult.style.display = 'none';
     screenCapture.style.display = 'block';
 });
 
-// Lancement au démarrage
 startCamera();

@@ -3,29 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Photobooth Pro</title>
+    <title>Photobooth Pro - No Stretch</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div class="container">
         <div id="screen-capture">
             <div class="header">
                 <h1>Souriez !</h1>
                 <button id="switch-camera" class="btn-icon">🔄</button>
             </div>
-            
-            <div class="camera-container landscape-mode">
+            <div class="camera-wrapper">
                 <video id="video" autoplay playsinline muted></video>
                 <img src="cadre.png" id="frame-overlay">
             </div>
-            
             <button id="snap" class="btn-main">Prendre la photo</button>
         </div>
 
         <div id="screen-result" style="display:none;">
             <h1>Magnifique ! ✨</h1>
-            <div class="result-box landscape-mode">
+            <div class="result-wrapper">
                 <img id="photo-result">
             </div>
             <div class="button-group">
@@ -33,10 +30,8 @@
                 <button id="retake" class="btn-secondary">Refaire</button>
             </div>
         </div>
-
         <canvas id="canvas" style="display:none;"></canvas>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>

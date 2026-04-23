@@ -9,6 +9,7 @@ body {
 
 .container { width: 100%; max-width: 600px; text-align: center; padding: 10px; }
 
+/* Styles pour le conteneur et le résultat, incluant l'adaptation automatique */
 .camera-wrapper, .result-wrapper {
     position: relative;
     width: 100%;
@@ -19,22 +20,26 @@ body {
     line-height: 0; /* Évite les espaces vides sous la vidéo */
 }
 
-#video, #photo-result {
-    width: 100%;
-    height: auto;
-    /* On ne force plus la hauteur, elle suivra le format natif de la caméra */
-}
-
+/* Forcer le cadre à s'étirer (fill) pour recouvrir toute la photo prise */
 #frame-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: fill; /* Le cadre s'étire pour couvrir toute la photo */
+    object-fit: fill; /* Étire le cadre pour couvrir */
     pointer-events: none;
     z-index: 10;
 }
+
+#video, #photo-result {
+    width: 100%;
+    height: auto;
+    display: block; /* La hauteur s'adapte à la caméra du téléphone */
+}
+
+.header { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
+.btn-icon { background: #2f3542; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; color: white; font-size: 1.2rem; }
 
 .btn-main {
     background: #00d2d3;
@@ -47,33 +52,7 @@ body {
     margin-top: 15px;
     cursor: pointer;
 }
-.camera-wrapper {
-    position: relative;
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-    line-height: 0; /* Supprime l'espace vide sous la vidéo */
-}
 
-#video {
-    width: 100%;
-    height: auto; /* La hauteur s'adapte à la caméra du téléphone */
-    display: block;
-}
-
-#frame-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* FORCE LE CADRE À ÉPOUSER LES BORDS DE LA VIDÉO */
-    object-fit: fill; 
-    pointer-events: none;
-    z-index: 10;
-}
-
-.btn-icon { background: #2f3542; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; color: white; }
 .button-group { display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: 15px; }
-.btn-download { background: #ff9f43; color: white; text-decoration: none; padding: 15px 40px; border-radius: 30px; }
+.btn-download { background: #ff9f43; color: white; text-decoration: none; padding: 15px 40px; border-radius: 30px; font-weight: bold; }
 .btn-secondary { background: #57606f; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; }

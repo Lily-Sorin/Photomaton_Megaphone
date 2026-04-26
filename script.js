@@ -13,8 +13,7 @@ let currentStream = null;
 let useFrontCamera = true;
 
 // Remplacez par votre URL réelle de Google Apps Script
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxczYoXrv7RRcjiuZzNz_9YWAl3oiatLBFp3tFZZCPiW9AakuJOFJVbJqKujO4iRS9_Hg/exec";
-
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFnxXFXNwTxUyeSKXnax7ZtpXnKp5AUe0x_afqB9K1wRIOZneiCUkaikJWcXFywQyRLg/exec";
 async function startCamera() {
     if (currentStream) {
         currentStream.getTracks().forEach(track => track.stop());

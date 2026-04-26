@@ -77,9 +77,7 @@ retake.addEventListener('click', () => {
 startCamera();
 
 // Remplacez par l'URL obtenue à l'étape précédente
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxhsQmTzQiyTzjyZuOcPpCCZ4SUjefVTifo6Lqyx6FzYuQYI9n2r2ZzoLS2ouifuTKcWg/exec";
-
-function uploadToDrive(base64Data) {
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxczYoXrv7RRcjiuZzNz_9YWAl3oiatLBFp3tFZZCPiW9AakuJOFJVbJqKujO4iRS9_Hg/exec";
     fetch(SCRIPT_URL, {
         method: "POST",
         mode: "no-cors", // Crucial pour Apps Script
@@ -90,18 +88,36 @@ function uploadToDrive(base64Data) {
     .catch(err => console.error("Erreur d'envoi :", err));
 }
 
-// Modifiez votre écouteur 'snap' existant :
+// Écouteur de capture UNIQUE et CORRIGÉ
 snap.addEventListener('click', () => {
-    // ... votre code existant pour dessiner sur le canvas ...
-    
+    const context = canvas.getContext('2d');
+
+    // 1. Définir la taille du canvas selon la vidéo
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // 2. Gérer l'effet miroir pour la photo finale
+    if (useFrontCamera) {
+        context.translate(canvas.width, 0);
+        context.scale(-1, 1);
+    }
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    context.setTransform(1, 0, 0, 1, 0, 0); // Reset transformation
+
+    // 3. Dessiner le cadre par-dessus la photo
+    context.drawImage(frameOverlay, 0, 0, canvas.width, canvas.height);
+
+    // 4. Générer l'image en Base64
     const imageData = canvas.toDataURL('image/png');
-    
-    // AJOUT : Envoyer vers le Drive
+
+    // 5. ENVOI AUTOMATIQUE AU DRIVE (en arrière-plan)
     uploadToDrive(imageData);
-    
-    // ... reste de votre code (affichage résultat) ...
+
+    // 6. Affichage du résultat sur l'écran pour l'utilisateur
     photoResult.src = imageData;
     downloadLink.href = imageData;
+    
     screenCapture.style.display = 'none';
     screenResult.style.display = 'block';
+});
 });

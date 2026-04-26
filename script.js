@@ -12,112 +12,72 @@ const screenResult = document.getElementById('screen-result');
 let currentStream = null;
 let useFrontCamera = true;
 
+// Remplacez par votre URL réelle de Google Apps Script
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxczYoXrv7RRcjiuZzNz_9YWAl3oiatLBFp3tFZZCPiW9AakuJOFJVbJqKujO4iRS9_Hg/exec";
+
 async function startCamera() {
     if (currentStream) {
         currentStream.getTracks().forEach(track => track.stop());
     }
-
     const mode = useFrontCamera ? "user" : "environment";
-    
     try {
         currentStream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: mode },
             audio: false
         });
         video.srcObject = currentStream;
-        
-        // Appliquer l'effet miroir visuel uniquement sur la vidéo en direct (selfie)
         video.style.transform = useFrontCamera ? "scaleX(-1)" : "scaleX(1)";
     } catch (err) {
         alert("Erreur caméra : " + err.message);
     }
 }
 
-// Changer de caméra
+function uploadToDrive(base64Data) {
+    fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: base64Data })
+    })
+    .then(() => console.log("Tentative d'envoi au Drive terminée."))
+    .catch(err => console.error("Erreur d'envoi :", err));
+}
+
+// Un seul écouteur pour le bouton capture
+snap.addEventListener('click', () => {
+    const context = canvas.getContext('2d');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    if (useFrontCamera) {
+        context.translate(canvas.width, 0);
+        context.scale(-1, 1);
+    }
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.drawImage(frameOverlay, 0, 0, canvas.width, canvas.height);
+
+    const imageData = canvas.toDataURL('image/png');
+    
+    // Affichage immédiat
+    photoResult.src = imageData;
+    downloadLink.href = imageData;
+    screenCapture.style.display = 'none';
+    screenResult.style.display = 'block';
+
+    // Envoi Drive en tâche de fond
+    uploadToDrive(imageData);
+});
+
 switchBtn.addEventListener('click', () => {
     useFrontCamera = !useFrontCamera;
     startCamera();
 });
 
-// Écouteur de capture UNIQUE
-snap.addEventListener('click', () => {
-    const context = canvas.getContext('2d');
-
-    // On utilise la taille réelle de la vidéo pour s'adapter à la photo
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    // Gérer l'inversion pour que la photo ne soit pas en miroir (texte lisible)
-    if (useFrontCamera) {
-        context.translate(canvas.width, 0);
-        context.scale(-1, 1);
-    }
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    context.setTransform(1, 0, 0, 1, 0, 0); // Reset miroir
-
-    // Dessiner le cadre qui s'étire pour couvrir toute la photo
-    context.drawImage(frameOverlay, 0, 0, canvas.width, canvas.height);
-
-    // Affichage du résultat
-    const imageData = canvas.toDataURL('image/png');
-    photoResult.src = imageData;
-    downloadLink.href = imageData;
-    
-    screenCapture.style.display = 'none';
-    screenResult.style.display = 'block';
-});
-
-// Refaire une photo
 retake.addEventListener('click', () => {
     screenResult.style.display = 'none';
     screenCapture.style.display = 'block';
 });
 
-// Lancement au chargement
+// Lancer la caméra au démarrage
 startCamera();
-
-// Remplacez par l'URL obtenue à l'étape précédente
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxczYoXrv7RRcjiuZzNz_9YWAl3oiatLBFp3tFZZCPiW9AakuJOFJVbJqKujO4iRS9_Hg/exec";
-    fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors", // Crucial pour Apps Script
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image: base64Data })
-    })
-    .then(() => console.log("Photo envoyée au Drive !"))
-    .catch(err => console.error("Erreur d'envoi :", err));
-}
-
-// Écouteur de capture UNIQUE et CORRIGÉ
-snap.addEventListener('click', () => {
-    const context = canvas.getContext('2d');
-
-    // 1. Définir la taille du canvas selon la vidéo
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    // 2. Gérer l'effet miroir pour la photo finale
-    if (useFrontCamera) {
-        context.translate(canvas.width, 0);
-        context.scale(-1, 1);
-    }
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    context.setTransform(1, 0, 0, 1, 0, 0); // Reset transformation
-
-    // 3. Dessiner le cadre par-dessus la photo
-    context.drawImage(frameOverlay, 0, 0, canvas.width, canvas.height);
-
-    // 4. Générer l'image en Base64
-    const imageData = canvas.toDataURL('image/png');
-
-    // 5. ENVOI AUTOMATIQUE AU DRIVE (en arrière-plan)
-    uploadToDrive(imageData);
-
-    // 6. Affichage du résultat sur l'écran pour l'utilisateur
-    photoResult.src = imageData;
-    downloadLink.href = imageData;
-    
-    screenCapture.style.display = 'none';
-    screenResult.style.display = 'block';
-});
-});

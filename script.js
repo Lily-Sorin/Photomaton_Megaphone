@@ -77,7 +77,7 @@ retake.addEventListener('click', () => {
 startCamera();
 
 // Remplacez par l'URL obtenue à l'étape précédente
-const SCRIPT_URL = "https://script.google.com/a/macros/rubika-edu.ca/s/AKfycbxhsQmTzQiyTzjyZuOcPpCCZ4SUjefVTifo6Lqyx6FzYuQYI9n2r2ZzoLS2ouifuTKcWg/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxhsQmTzQiyTzjyZuOcPpCCZ4SUjefVTifo6Lqyx6FzYuQYI9n2r2ZzoLS2ouifuTKcWg/exec";
 
 function uploadToDrive(base64Data) {
     fetch(SCRIPT_URL, {

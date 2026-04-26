@@ -75,3 +75,33 @@ retake.addEventListener('click', () => {
 
 // Lancement au chargement
 startCamera();
+
+// Remplacez par l'URL obtenue à l'étape précédente
+const SCRIPT_URL = "https://script.google.com/a/macros/rubika-edu.ca/s/AKfycbxhsQmTzQiyTzjyZuOcPpCCZ4SUjefVTifo6Lqyx6FzYuQYI9n2r2ZzoLS2ouifuTKcWg/exec";
+
+function uploadToDrive(base64Data) {
+    fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors", // Crucial pour Apps Script
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: base64Data })
+    })
+    .then(() => console.log("Photo envoyée au Drive !"))
+    .catch(err => console.error("Erreur d'envoi :", err));
+}
+
+// Modifiez votre écouteur 'snap' existant :
+snap.addEventListener('click', () => {
+    // ... votre code existant pour dessiner sur le canvas ...
+    
+    const imageData = canvas.toDataURL('image/png');
+    
+    // AJOUT : Envoyer vers le Drive
+    uploadToDrive(imageData);
+    
+    // ... reste de votre code (affichage résultat) ...
+    photoResult.src = imageData;
+    downloadLink.href = imageData;
+    screenCapture.style.display = 'none';
+    screenResult.style.display = 'block';
+});
